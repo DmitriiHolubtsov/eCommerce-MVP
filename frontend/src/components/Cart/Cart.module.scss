@@ -1,0 +1,30 @@
+.cartContainer {
+  background-color: #f9fafb;
+  border-radius: 8px;
+}
+
+.cartHeader {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.cartItem {
+  padding: 1rem 0;
+  border-bottom: 1px solid #e5e7eb;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .productInfo {
+    color: #374151;
+  }
+
+  .removeButton {
+    background-color: #ef4444;
+    &:hover {
+      background-color: #dc2626;
+    }
+  }
+}
