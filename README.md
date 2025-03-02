@@ -44,66 +44,66 @@ This is a full-stack e-commerce application built with **React** (frontend) and 
 
 ## Project Structure
 
-├── backend/
-│   ├── src/
-│   │   ├── controllers/          # Business logic for API endpoints
-│   │   │   ├── authController.ts
-│   │   │   ├── categoryController.ts
-│   │   │   ├── locationController.ts
-│   │   │   ├── novaPoshtaController.ts
-│   │   │   ├── orderController.ts
-│   │   │   ├── productController.ts
-│   │   │   └── userController.ts
-│   │   ├── middleware/           # Middleware (e.g., authentication)
-│   │   │   └── authMiddleware.ts
-│   │   ├── models/              # MongoDB schemas
-│   │   │   ├── Category.ts
-│   │   │   ├── Location.ts
-│   │   │   ├── Order.ts
-│   │   │   ├── Product.ts
-│   │   │   └── User.ts
-│   │   ├── routes/              # API routes
-│   │   │   ├── authRoutes.ts
-│   │   │   ├── categoryRoutes.ts
-│   │   │   ├── locationRoutes.ts
-│   │   │   ├── novaPoshtaRoutes.ts
-│   │   │   ├── orderRoutes.ts
-│   │   │   ├── productRoutes.ts
-│   │   │   └── userRoutes.ts
-│   │   ├── multerConfig.ts      # Multer configuration for file uploads
-│   │   └── server.ts            # Main server file
-│   ├── uploads/                 # Directory for uploaded files (avatars, product images)
-│   ├── .env                     # Environment variables
-│   ├── package.json
-│   └── tsconfig.json
-├── frontend/
-│   ├── src/
-│   │   ├── api/                # API configuration
-│   │   │   └── api.ts
-│   │   ├── components/         # Reusable React components
-│   │   │   ├── Cart.tsx
-│   │   │   ├── LoginForm.tsx
-│   │   │   ├── OrderForm.tsx
-│   │   │   ├── ProductList.tsx
-│   │   │   ├── RegisterForm.tsx
-│   │   │   ├── Header.tsx
-│   │   │   └── Footer.tsx
-│   │   ├── pages/             # Page components
-│   │   │   ├── AdminDashboard.tsx
-│   │   │   ├── Home.tsx
-│   │   │   ├── OrderPage.tsx
-│   │   │   └── UserDashboard.tsx
-│   │   ├── redux/             # Redux store and slices
-│   │   │   ├── authSlice.ts
-│   │   │   ├── cartSlice.ts
-│   │   │   └── store.ts
-│   │   ├── App.tsx            # Main app component with routing
-│   │   ├── index.tsx          # Entry point
-│   │   └── index.css          # Global styles (Tailwind)
-│   ├── .env                   # Frontend environment variables
-│   ├── package.json
-│   └── tsconfig.json
-├── README.md                  # Project documentation
+### - backend/
+### -- src/
+### --- controllers/          # Business logic for API endpoints
+### ---- authController.ts
+### ---- categoryController.ts
+### ---- locationController.ts
+### ---- novaPoshtaController.ts
+### ---- orderController.ts
+### ---- productController.ts
+### ---- userController.ts
+### --- middleware/           # Middleware (e.g., authentication)
+### ---- authMiddleware.ts
+### --- models/              # MongoDB schemas
+### ---- Category.ts
+### ---- Location.ts
+### ---- Order.ts
+### ---- Product.ts
+### ---- User.ts
+### --- routes/              # API routes
+### ---- authRoutes.ts
+### ---- categoryRoutes.ts
+### ---- locationRoutes.ts
+### ---- novaPoshtaRoutes.ts
+### ---- orderRoutes.ts
+### ---- productRoutes.ts
+### ---- userRoutes.ts
+### -- multerConfig.ts      # Multer configuration for file uploads
+### -- server.ts            # Main server file
+### -- uploads/# Directory for uploaded files (avatars, product images)
+### -- .env                     # Environment variables
+### -- package.json
+### -- tsconfig.json
+### - frontend/
+### -- src/
+### --- api/                # API configuration
+### ---- api.ts
+### --- components/         # Reusable React components
+### ---- Cart.tsx
+### ---- LoginForm.tsx
+### ---- OrderForm.tsx
+### ---- ProductList.tsx
+### ---- RegisterForm.tsx
+### ---- Header.tsx
+### ---- Footer.tsx
+### --- pages/             # Page components
+### ---- AdminDashboard.tsx
+### ---- Home.tsx
+### ---- OrderPage.tsx
+### ---- UserDashboard.tsx
+### --- redux/             # Redux store and slices
+### ---- authSlice.ts
+### ---- cartSlice.ts
+### ---- store.ts
+### -- App.tsx            # Main app component with routing
+### -- index.tsx          # Entry point
+### -- index.css          # Global styles (Tailwind)
+### -- .env                   # Frontend environment variables
+### -- package.json
+### -- tsconfig.json
+### -- README.md                  # Project documentation
 
 ## Prerequisites
 - **Node.js** (v16.x or later)

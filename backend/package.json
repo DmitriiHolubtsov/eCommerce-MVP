@@ -5,10 +5,9 @@
     "scripts": {
         "start": "node dist/server.js",
         "dev": "nodemon src/server.ts",
-        "build": "react-scripts build",
+        "build": "tsc",
         "watch": "tsc --watch",
-        "test": "react-scripts test",
-        "lint": "eslint . --ext .ts,.tsx",
+        "lint": "eslint . --ext .ts",
         "format": "prettier --write ."
     },
     "dependencies": {
