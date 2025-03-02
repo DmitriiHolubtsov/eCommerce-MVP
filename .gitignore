@@ -4,4 +4,4 @@ node_modules
 .DStore
 .idea/
 package-lock.json
-# .env
+.env
