@@ -44,14 +44,14 @@ This is a full-stack e-commerce application built with **React** (frontend) and 
 
 ## Project Structure
 
-- backend/
--- src/
---- controllers/          # Business logic for API endpoints
----- authController.ts
----- categoryController.ts
----- locationController.ts
----- novaPoshtaController.ts
----- orderController.ts
+#### - backend/
+#### -- src/
+#### --- controllers/          # Business logic for API endpoints
+#### ---- authController.ts
+### ---- categoryController.ts
+### ---- locationController.ts
+### ---- novaPoshtaController.ts
+### ---- orderController.ts
 ### ---- productController.ts
 ### ---- userController.ts
 ### --- middleware/           # Middleware (e.g., authentication)
