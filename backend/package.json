@@ -10,7 +10,7 @@
         "lint": "eslint . --ext .ts",
         "format": "prettier --write ."
     },
-        "engines": {
+    "engines": {
         "node": "18.x"
     },
     "dependencies": {

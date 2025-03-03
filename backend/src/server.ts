@@ -19,6 +19,7 @@ dotenv.config();
 
 const app = express();
 
+// Налаштування CORS першим
 app.use(
   cors({
     origin: [
@@ -46,6 +47,7 @@ app.options(
   }),
 );
 
+// Логування запитів і відповідей
 app.use((req, res, next) => {
   console.log(`Request: ${req.method} ${req.url} from ${req.headers.origin}`);
   res.on('finish', () => {
