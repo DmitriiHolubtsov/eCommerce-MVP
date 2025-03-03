@@ -37,8 +37,10 @@ const RegisterForm = () => {
         console.log('Register response:', res.data);
         dispatch(login(res.data.token));
         localStorage.setItem('token', res.data.token);
+        console.log('Dispatched login and set token');
         setStatus('Registration successful!');
         navigate('/dashboard');
+        console.log('Navigated to /dashboard');
       } catch (error: any) {
         console.error('Register error:', error.response?.data || error.message);
         setStatus(error.response?.data?.message || 'Registration failed');
