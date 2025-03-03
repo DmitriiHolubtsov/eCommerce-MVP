@@ -73,9 +73,8 @@ export const register = async (req: Request, res: Response) => {
 
 export const getProfile = async (req: Request, res: Response) => {
   try {
-    // Отримуємо ID користувача з токена через authMiddleware
     const userId = (req as any).user.id;
-    const user = await User.findById(userId).select('-password'); // Виключаємо пароль із відповіді
+    const user = await User.findById(userId).select('-password');
 
     if (!user) {
       console.log('User not found:', userId);
