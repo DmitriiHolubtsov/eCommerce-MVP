@@ -19,6 +19,7 @@ dotenv.config();
 
 const app = express();
 
+// Налаштування CORS
 app.use(
   cors({
     origin: [
@@ -32,7 +33,20 @@ app.use(
   }),
 );
 
-app.options('*', cors());
+// Дозволяємо OPTIONS для всіх маршрутів
+app.options(
+  '*',
+  cors({
+    origin: [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'https://e-commerce-mvp-uuse.vercel.app',
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+  }),
+);
 
 app.use((req, res, next) => {
   console.log(`Request: ${req.method} ${req.url} from ${req.headers.origin}`);
@@ -95,4 +109,4 @@ mongoose
     await createInitialLocations();
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   })
-  .catch((err) => console.error('MongoDB connection error:', err.message));
+  .catch((err) => console.error('MongoDB connection error:', err));
