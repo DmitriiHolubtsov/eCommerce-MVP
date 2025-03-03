@@ -24,7 +24,7 @@ app.use(
     origin: [
       'http://localhost:3000',
       'http://localhost:3001',
-      'https://e-commerce-mvp-uuse.vercel.app',
+      'https://e-commerce-mvp.vercel.app',
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
