@@ -1,10 +1,6 @@
 # eCommerce-MVP
 
-# NODEJS_HOMEWORKS
-
-# E-Shop Project
-
-This is a full-stack e-commerce application built with **React** (frontend) and **Node.js/Express** (backend). It allows users to browse products, add them to a cart, and place orders with delivery options via Nova Poshta. Administrators can manage products, categories, and users through an admin dashboard.
+A full-stack e-commerce application built with **React** (frontend) and **Node.js/Express** (backend). Users can browse products, add them to a cart, and place orders with Nova Poshta delivery options. Administrators can manage products, categories, and users via an admin dashboard.
 
 ## Table of Contents
 
@@ -12,8 +8,8 @@ This is a full-stack e-commerce application built with **React** (frontend) and 
 - [Project Structure](#project-structure)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
-  - [Development](#development)
-  - [Production](#production)
+  - [Local Development](#local-development)
+  - [Remote Deployment](#remote-deployment)
 - [Usage](#usage)
 - [API Endpoints](#api-endpoints)
 - [Technologies](#technologies)
@@ -23,23 +19,20 @@ This is a full-stack e-commerce application built with **React** (frontend) and 
 ## Features
 
 - **User Features**:
-
-  - Browse products on the home and shop pages.
-  - Add products to the cart (requires login).
-  - Place an order with Nova Poshta branch selection.
+  - Browse products on Home and Shop pages.
+  - Add products to cart (requires login).
+  - Place orders with Nova Poshta branch selection.
   - View and update user profile with avatar upload.
-  - User registration and login.
+  - Register and log in.
 
 - **Admin Features**:
-
   - Manage products (create, edit, delete) with image uploads.
-  - Manage categories (create, edit, delete).
+  - Manage categories (create, edit, delete) with image uploads.
   - Manage users (create, edit, delete) with avatar uploads.
 
 - **General**:
-
   - Responsive design with Tailwind CSS.
-  - Authentication with JWT (JSON Web Tokens).
+  - JWT-based authentication.
   - Persistent cart state with Redux.
 
 ## Project Structure
@@ -49,6 +42,7 @@ This is a full-stack e-commerce application built with **React** (frontend) and 
 #### --- controllers/          # Business logic for API endpoints
 #### ---- authController.ts
 #### ---- categoryController.ts
+#### ---- fileController.ts
 #### ---- locationController.ts
 #### ---- novaPoshtaController.ts
 #### ---- orderController.ts
@@ -65,6 +59,7 @@ This is a full-stack e-commerce application built with **React** (frontend) and 
 #### --- routes/              # API routes
 #### ---- authRoutes.ts
 #### ---- categoryRoutes.ts
+#### ---- fileRoutes.ts
 #### ---- locationRoutes.ts
 #### ---- novaPoshtaRoutes.ts
 #### ---- orderRoutes.ts
@@ -72,7 +67,7 @@ This is a full-stack e-commerce application built with **React** (frontend) and 
 #### ---- userRoutes.ts
 #### -- multerConfig.ts      # Multer configuration for file uploads
 #### -- server.ts            # Main server file
-#### -- uploads/ #for uploaded files (avatars, product images)
+#### -- uploads/             #for uploaded files (avatars, product images)
 #### -- .env                     # Environment variables
 #### -- package.json
 #### -- tsconfig.json
@@ -92,6 +87,7 @@ This is a full-stack e-commerce application built with **React** (frontend) and 
 #### ---- AdminDashboard.tsx
 #### ---- Home.tsx
 #### ---- OrderPage.tsx
+#### ---- ProductList.tsx
 #### ---- UserDashboard.tsx
 #### --- redux/             # Redux store and slices
 #### ---- authSlice.ts
@@ -106,21 +102,22 @@ This is a full-stack e-commerce application built with **React** (frontend) and 
 #### -- README.md                  # Project documentation
 
 ## Prerequisites
-- **Node.js** (v16.x or later)
-- **npm** (v8.x or later)
-- **MongoDB** (local instance or MongoDB Atlas)
-- **Git** (for cloning the repository)
+
+- **Node.js**: v18.x or later
+- **npm**: v8.x or later
+- **MongoDB**: Local instance or MongoDB Atlas
+- **Git**: For cloning the repository
 
 ## Installation
 
-### Development
+### Local Development
 
-1. **Clone the repository**:
+1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/yourusername/repo-name
-   cd this project
+   git clone https://github.com/DmitriiHolubtsov/eCommerce-MVP.git
+   cd eCommerce-MVP
 
-2. **Set up the backend**:
+2. Backend Setup:
 
 - Navigate to the backend folder:
 cd backend
@@ -129,15 +126,17 @@ cd backend
 npm install
 
 - Create a .env file in backend/ with the followin
+
+API_URL=http://localhost:5001
 PORT=5001
 MONGO_URI=mongodb://localhost:27017/ecommerce
 JWT_SECRET=your_secret_key
-NOVA_POSHTA_API_KEY=your_key
+NOVA_POSHTA_API_KEY=your_nova_poshta_key
 
-- Start the development server:
+- Start the backend::
 npm run dev
 
-3. **Set up the frontend**:
+3. **Frontend Setup**:
 
 - Navigate to the frontend folder:
 cd ../frontend
@@ -151,127 +150,140 @@ REACT_APP_API_URL=http://localhost:5001/api/v1
 - Start the development server:
 npm start
 
-4. **Access the app**:
+4. **Access Locally**:
 
 Frontend: http://localhost:3001
 Backend API: http://localhost:5001/api/v1
 
-## Production
+## Remote Deployment
 
-1. **Backend**:
+1. **Backend (Render)**:
 
-- Build the TypeScript code:
-cd backend
-npm run build
-- Install production dependencies:
-npm install --production
-- Start the server:
-npm start
+1. Push to GitHub:
 
-Deploy to a service like Heroku, ensuring .env variables are set.
+git add .
+git commit -m "Prepare for Render deployment"
+git push
 
-2. **Frontend**:
+2. Deploy on Render:
 
-- Build the React app:
-cd frontend
-npm run build
+- Visit Render Dashboard → "New" → "Web Service".
+- Connect: https://github.com/DmitriiHolubtsov/eCommerce-MVP.
 
-- Serve the build folder using a static server (e.g., serve):
-npm install -g serve serve -s build
+Settings:
+- Name: ecommerce-mvp
+- Root Directory: backend
+- Runtime: Node
+- Build Command: npm install && npm run build
+- Start Command: npm start
+- Environment Variables
 
-3. **MongoDB**:
+API_URL=https://ecommerce-mvp.onrender.com
+PORT=5001
+MONGO_URI=mongodb+srv://<username>:<password>@cluster0.z6slu.mongodb.net/eshop?retryWrites=true&w=majority
+JWT_SECRET=your_secret_key
+NOVA_POSHTA_API_KEY=your_nova_poshta_key
+NODE_ENV=production
 
-Use MongoDB Atlas for a cloud-hosted database and update MONGO_URI у .env.
+- Deploy and access: https://ecommerce-mvp.onrender.com/api/v1
 
-## Usage
+2. **Frontend (Vercel)**:
 
-1. **Initial Setup**:
+- Push to GitHub:
 
-- An admin user (admin@example.com / admin123) is created automatically on first backend startup.
+git add .
+git commit -m "Prepare for Vercel deployment"
+git push
 
-2. **User Flow**:
+- Deploy on Vercel:
 
-- Register via /register or log in via /login.
-- Browse products on / or /shop.
-- Add items to the cart and place an order on /order.
+- Visit Vercel Dashboard → "New Project".
+- Import: https://github.com/DmitriiHolubtsov/eCommerce-MVP.
 
-2. **Admin Flow**:
+Settings:
+- Framework Preset: Create React App
+- Root Directory: frontend
+- Build Command: npm run build
+- Output Directory: build
+- Environment Variables:
 
-- Log in as admin (admin@example.com / admin123).
-- Access /admin to manage products, categories, and users.
+REACT_APP_API_URL=https://ecommerce-mvp.onrender.com/api/v1
+
+- Deploy and access: https://e-commerce-mvp-uuse.vercel.app
 
 
-## API Endpoints
+3. **MongoDB Atlas**:
 
-1. **Authentication**
+- Set up a free cluster on MongoDB Atlas:
+- Create a user (e.g., dmitriiholubtsov / securepassword123).
+- Allow access from 0.0.0.0/0 in Network Access.
+- Copy the connection string to .env or Render/Vercel settings.
 
-- POST /api/v1/auth/login - Log in a user (returns JWT token).
-- POST /api/v1/auth/register - Register a new user (returns JWT token).
-- GET /api/v1/auth/profile - Get authenticated user's profile (requires token).
+4. **Usage**:
+- Initial Setup: Admin user admin@example.com / admin123 is created on backend startup.
 
-**Users (Admin only)**
+- User Flow: Register/login at /register or /login, browse / or /shop, order at /order.
 
-- GET /api/v1/users - Get all users.
-- POST /api/v1/users - Create a new user (with avatar upload).
-- GET /api/v1/users/:id - Get user by ID.
-- PUT /api/v1/users/:id - Update user (with avatar upload).
+- Admin Flow: Login as admin, access /admin to manage products, categories, and users.
+
+5. **API Endpoints**
+Auth:
+- POST /api/v1/auth/login - Login (returns JWT).
+- POST /api/v1/auth/register - Register (returns JWT).
+- GET /api/v1/auth/profile - User profile (requires token).
+
+Products:
+- GET /api/v1/products - List products.
+- POST /api/v1/products - Create product (admin, with images).
+- PUT /api/v1/products/:id - Update product (admin).
+- DELETE /api/v1/products/:id - Delete product (admin).
+
+Categories:
+- GET /api/v1/categories - List categories.
+- POST /api/v1/categories - Create category (admin, with image).
+- PUT /api/v1/categories/:id - Update category (admin).
+- DELETE /api/v1/categories/:id - Delete category (admin).
+
+Users (Admin):
+- GET /api/v1/users - List users.
+- POST /api/v1/users - Create user (with avatar).
+- PUT /api/v1/users/:id - Update user (with avatar).
 - DELETE /api/v1/users/:id - Delete user.
 
-**Products**
+Orders:
+- POST /api/v1/orders/create - Create order (requires token).
 
-- GET /api/v1/products - Get all products.
-- POST /api/v1/products - Create a product (admin only, with image upload).
-- GET /api/v1/products/:id - Get product by ID.
-- PUT /api/v1/products/:id - Update product (admin only, with image upload).
-- DELETE /api/v1/products/:id - Delete product (admin only).
+Locations:
+- GET /api/v1/locations - List locations.
 
-**Categories**
+Nova Poshta:
+- GET /api/v1/nova-poshta/branches - List branches.
 
-- GET /api/v1/categories - Get all categories.
-- POST /api/v1/categories - Create a category (admin only).
-- PUT /api/v1/categories/:id - Update category (admin only).
-- DELETE /api/v1/categories/:id - Delete category (admin only).
+Files:
+- POST /api/v1/files/upload - Upload file (returns URL).
 
-**Orders**
+**Technologies**:
+Frontend: 
+- React, 
+- TypeScript, 
+- Redux, 
+- Tailwind CSS, 
+- Axios
 
-- POST /api/v1/orders/create - Create an order (requires token).
+Backend: 
+- Node.js, 
+- Express, 
+- TypeScript, 
+- MongoDB (Mongoose), 
+- JWT, 
+- Multer
 
-**Locations**
-
-- GET /api/v1/locations - Get static list of locations (e.g., Kyiv, Lviv).
-
-**Nova Poshta**
-
-- GET /api/v1/nova-poshta/branches - Get Nova Poshta branches.
-
-
-## Technologies
-
-1. **Frontend**:
-
-- React
-- TypeScript
-- Redux (state management)
-- Tailwind CSS (styling)
-- Axios (API requests)
-
-2. **Backend**:
-
-- Node.js
-- Express
-- TypeScript
-- MongoDB (Mongoose)
-- JWT (authentication)
-- Multer (file uploads)
-
-3. **Contributing**:
-
+**Contributing**:
 - Fork the repository.
-- Create a feature branch (git checkout -b feature/your-feature).
-- Commit your changes (git commit -m 'Add your feature').
-- Push to the branch (git push origin feature/your-feature).
+- Create a branch: git checkout -b feature/your-feature.
+- Commit changes: git commit -m "Add your feature".
+- Push: git push origin feature/your-feature.
 - Open a Pull Request.
 
-4. **License**:
-
-This project is licensed under the MIT License. See the LICENSE file for details.
+**License**:
+- MIT License
