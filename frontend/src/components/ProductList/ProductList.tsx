@@ -1,45 +1,70 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../redux/store';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState, AppDispatch } from '../../redux/store';
 import { addToCartAsync } from '../../redux/cartSlice';
-import { AppDispatch } from '../../redux/store';
 import styles from './ProductList.module.scss';
 
+interface Product {
+  _id: string;
+  title: string;
+  price: number;
+  description: string;
+  images: string[];
+}
+
+interface Category {
+  _id: string;
+  name: string;
+}
+
 const ProductList = () => {
-  const [products, setProducts] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const dispatch = useDispatch<AppDispatch>();
   const { token } = useSelector((state: RootState) => state.auth);
 
+  const fetchCategories = useCallback(async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.REACT_APP_API_URL}/categories`,
+      );
+      setCategories(res.data);
+    } catch (err: any) {
+      console.error(
+        'Error fetching categories:',
+        err.response?.data || err.message,
+      );
+    }
+  }, []);
+
+  const fetchProducts = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const url = selectedCategory
+        ? `${process.env.REACT_APP_API_URL}/categories/${selectedCategory}/products`
+        : `${process.env.REACT_APP_API_URL}/products`;
+      const res = await axios.get(url);
+      setProducts(res.data);
+    } catch (err: any) {
+      setError('Failed to load products');
+      console.error(
+        'Error fetching products:',
+        err.response?.data || err.message,
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedCategory]);
+
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await axios.get(
-          `${process.env.REACT_APP_API_URL}/categories`,
-        );
-        setCategories(res.data);
-      } catch (error) {
-        console.error('Error fetching categories:', error);
-      }
-    };
-
-    const fetchProducts = async () => {
-      try {
-        const url = selectedCategory
-          ? `${process.env.REACT_APP_API_URL}/categories/${selectedCategory}/products`
-          : `${process.env.REACT_APP_API_URL}/products`;
-        const res = await axios.get(url);
-        setProducts(res.data);
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      }
-    };
-
     fetchCategories();
     fetchProducts();
-  }, [selectedCategory]);
+  }, [fetchCategories, fetchProducts]);
 
   const handleAddToCart = (productId: string) => {
     if (token) {
@@ -47,13 +72,16 @@ const ProductList = () => {
     }
   };
 
+  if (loading) return <p className="text-center text-gray-500">Loading...</p>;
+  if (error) return <p className="text-center text-red-500">{error}</p>;
+
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
         Shop
       </h1>
-      <div className="mb-6 flex justify-center">
-        <label className="mr-3 text-lg font-medium text-gray-700">
+      <div className="mb-6 flex justify-center items-center gap-3">
+        <label className="text-lg font-medium text-gray-700">
           Filter by Category:
         </label>
         <select
@@ -89,11 +117,12 @@ const ProductList = () => {
               <p className={`${styles.description} mb-4`}>
                 {product.description}
               </p>
-              {product.images && product.images.length > 0 && (
+              {product.images?.length > 0 && (
                 <img
                   src={product.images[0]}
                   alt={product.title}
                   className={`${styles.image} w-full h-48 object-cover`}
+                  loading="lazy"
                 />
               )}
               {token ? (

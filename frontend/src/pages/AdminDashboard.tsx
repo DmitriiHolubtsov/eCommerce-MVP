@@ -1,9 +1,32 @@
 import { useEffect, useState } from 'react';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+
+interface Product {
+  _id: string;
+  title: string;
+  price: number;
+  description: string;
+  category: string;
+  images: string[];
+}
+
+interface Category {
+  _id: string;
+  name: string;
+  image?: string;
+}
+
+interface User {
+  _id: string;
+  email: string;
+  name: string;
+  role: 'user' | 'admin';
+  avatar?: string;
+}
 
 interface ProductFormValues {
   title: string;
@@ -27,16 +50,22 @@ interface UserFormValues {
 }
 
 const AdminDashboard = () => {
-  const [categories, setCategories] = useState<any[]>([]);
-  const [products, setProducts] = useState<any[]>([]);
-  const [users, setUsers] = useState<any[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const { token } = useSelector((state: RootState) => state.auth);
-  const [editingProduct, setEditingProduct] = useState<any>(null);
-  const [editingCategory, setEditingCategory] = useState<any>(null);
-  const [editingUser, setEditingUser] = useState<any>(null);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!token) return;
+
+      setLoading(true);
+      setError(null);
       try {
         const [catRes, prodRes, userRes] = await Promise.all([
           axios.get(`${process.env.REACT_APP_API_URL}/categories`, {
@@ -52,21 +81,35 @@ const AdminDashboard = () => {
         setCategories(catRes.data);
         setProducts(prodRes.data);
         setUsers(userRes.data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
+      } catch (err: any) {
+        setError('Failed to load admin data');
+        console.error(
+          'Error fetching data:',
+          err.response?.data || err.message,
+        );
+      } finally {
+        setLoading(false);
       }
     };
-    if (token) fetchData();
+    fetchData();
   }, [token]);
 
   const productFormik = useFormik<ProductFormValues>({
-    initialValues: editingProduct || {
-      title: '',
-      price: 0,
-      description: '',
-      category: '',
-      images: [],
-    },
+    initialValues: editingProduct
+      ? {
+          title: editingProduct.title,
+          price: editingProduct.price,
+          description: editingProduct.description,
+          category: editingProduct.category,
+          images: [],
+        }
+      : {
+          title: '',
+          price: 0,
+          description: '',
+          category: '',
+          images: [],
+        },
     enableReinitialize: true,
     validationSchema: Yup.object({
       title: Yup.string().required('Required'),
@@ -83,47 +126,39 @@ const AdminDashboard = () => {
       values.images.forEach((image) => formData.append('images', image));
 
       try {
-        if (editingProduct) {
-          const res = await axios.put(
-            `${process.env.REACT_APP_API_URL}/products/${editingProduct._id}`,
-            formData,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'multipart/form-data',
-              },
-            },
-          );
-          setProducts(
-            products.map((p) => (p._id === editingProduct._id ? res.data : p)),
-          );
-          setEditingProduct(null);
-        } else {
-          const res = await axios.post(
-            `${process.env.REACT_APP_API_URL}/products`,
-            formData,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'multipart/form-data',
-              },
-            },
-          );
-          setProducts([...products, res.data]);
-        }
-        productFormik.resetForm();
-      } catch (error) {
-        const axiosError = error as AxiosError<any>;
-        console.error(
-          'Error with product:',
-          axiosError.response?.data || axiosError.message,
+        const url = editingProduct
+          ? `${process.env.REACT_APP_API_URL}/products/${editingProduct._id}`
+          : `${process.env.REACT_APP_API_URL}/products`;
+        const method = editingProduct ? 'put' : 'post';
+        const res = await axios({
+          method,
+          url,
+          data: formData,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        setProducts(
+          editingProduct
+            ? products.map((p) => (p._id === editingProduct._id ? res.data : p))
+            : [...products, res.data],
         );
+        setEditingProduct(null);
+        productFormik.resetForm();
+      } catch (err: any) {
+        console.error('Error with product:', err.response?.data || err.message);
       }
     },
   });
 
   const categoryFormik = useFormik<CategoryFormValues>({
-    initialValues: editingCategory || { name: '', image: null },
+    initialValues: editingCategory
+      ? {
+          name: editingCategory.name,
+          image: null,
+        }
+      : { name: '', image: null },
     enableReinitialize: true,
     validationSchema: Yup.object({
       name: Yup.string().required('Required'),
@@ -131,56 +166,56 @@ const AdminDashboard = () => {
     onSubmit: async (values) => {
       const formData = new FormData();
       formData.append('name', values.name);
-      if (values.image) {
-        formData.append('image', values.image);
-      }
+      if (values.image) formData.append('image', values.image);
 
       try {
-        if (editingCategory) {
-          const res = await axios.put(
-            `${process.env.REACT_APP_API_URL}/categories/${editingCategory._id}`,
-            formData,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'multipart/form-data',
-              },
-            },
-          );
-          setCategories(
-            categories.map((c) =>
-              c._id === editingCategory._id ? res.data : c,
-            ),
-          );
-          setEditingCategory(null);
-        } else {
-          const res = await axios.post(
-            `${process.env.REACT_APP_API_URL}/categories`,
-            formData,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'multipart/form-data',
-              },
-            },
-          );
-          setCategories([...categories, res.data]);
-        }
+        const url = editingCategory
+          ? `${process.env.REACT_APP_API_URL}/categories/${editingCategory._id}`
+          : `${process.env.REACT_APP_API_URL}/categories`;
+        const method = editingCategory ? 'put' : 'post';
+        const res = await axios({
+          method,
+          url,
+          data: formData,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        setCategories(
+          editingCategory
+            ? categories.map((c) =>
+                c._id === editingCategory._id ? res.data : c,
+              )
+            : [...categories, res.data],
+        );
+        setEditingCategory(null);
         categoryFormik.resetForm();
-      } catch (error) {
-        console.error('Error with category:', error);
+      } catch (err: any) {
+        console.error(
+          'Error with category:',
+          err.response?.data || err.message,
+        );
       }
     },
   });
 
   const userFormik = useFormik<UserFormValues>({
-    initialValues: editingUser || {
-      email: '',
-      password: '',
-      name: '',
-      role: 'user',
-      avatar: null,
-    },
+    initialValues: editingUser
+      ? {
+          email: editingUser.email,
+          password: '',
+          name: editingUser.name,
+          role: editingUser.role,
+          avatar: null,
+        }
+      : {
+          email: '',
+          password: '',
+          name: '',
+          role: 'user',
+          avatar: null,
+        },
     enableReinitialize: true,
     validationSchema: Yup.object({
       email: Yup.string().email('Invalid email').required('Required'),
@@ -194,65 +229,72 @@ const AdminDashboard = () => {
       formData.append('password', values.password);
       formData.append('name', values.name);
       formData.append('role', values.role);
-      if (values.avatar) {
-        formData.append('avatar', values.avatar);
-      }
+      if (values.avatar) formData.append('avatar', values.avatar);
 
       try {
-        if (editingUser) {
-          const res = await axios.put(
-            `${process.env.REACT_APP_API_URL}/users/${editingUser._id}`,
-            formData,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'multipart/form-data',
-              },
-            },
-          );
-          setUsers(
-            users.map((u) => (u._id === editingUser._id ? res.data : u)),
-          );
-          setEditingUser(null);
-        } else {
-          const res = await axios.post(
-            `${process.env.REACT_APP_API_URL}/users`,
-            formData,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'multipart/form-data',
-              },
-            },
-          );
-          setUsers([...users, res.data]);
-        }
+        const url = editingUser
+          ? `${process.env.REACT_APP_API_URL}/users/${editingUser._id}`
+          : `${process.env.REACT_APP_API_URL}/users`;
+        const method = editingUser ? 'put' : 'post';
+        const res = await axios({
+          method,
+          url,
+          data: formData,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        setUsers(
+          editingUser
+            ? users.map((u) => (u._id === editingUser._id ? res.data : u))
+            : [...users, res.data],
+        );
+        setEditingUser(null);
         userFormik.resetForm();
-      } catch (error) {
-        console.error('Error with user:', error);
+      } catch (err: any) {
+        console.error('Error with user:', err.response?.data || err.message);
       }
     },
   });
 
   const deleteProduct = async (id: string) => {
-    await axios.delete(`${process.env.REACT_APP_API_URL}/products/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    setProducts(products.filter((p) => p._id !== id));
+    try {
+      await axios.delete(`${process.env.REACT_APP_API_URL}/products/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setProducts(products.filter((p) => p._id !== id));
+    } catch (err: any) {
+      console.error(
+        'Error deleting product:',
+        err.response?.data || err.message,
+      );
+    }
   };
 
   const deleteCategory = async (id: string) => {
-    await axios.delete(`${process.env.REACT_APP_API_URL}/categories/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    setCategories(categories.filter((c) => c._id !== id));
+    try {
+      await axios.delete(`${process.env.REACT_APP_API_URL}/categories/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setCategories(categories.filter((c) => c._id !== id));
+    } catch (err: any) {
+      console.error(
+        'Error deleting category:',
+        err.response?.data || err.message,
+      );
+    }
   };
 
   const deleteUser = async (id: string) => {
-    await axios.delete(`${process.env.REACT_APP_API_URL}/users/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    setUsers(users.filter((u) => u._id !== id));
+    try {
+      await axios.delete(`${process.env.REACT_APP_API_URL}/users/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUsers(users.filter((u) => u._id !== id));
+    } catch (err: any) {
+      console.error('Error deleting user:', err.response?.data || err.message);
+    }
   };
 
   if (!token) {
@@ -262,6 +304,10 @@ const AdminDashboard = () => {
       </p>
     );
   }
+
+  if (loading)
+    return <p className="p-4 text-gray-500 text-center">Loading...</p>;
+  if (error) return <p className="p-4 text-red-500 text-center">{error}</p>;
 
   return (
     <div className="container mx-auto p-6">
@@ -343,7 +389,7 @@ const AdminDashboard = () => {
           <button
             type="button"
             onClick={() => setEditingProduct(null)}
-            className="bg-gray-500 text-white p-2 w-full rounded-md hover:bg-gray-600"
+            className="bg-gray-500 text-white p-2 w-full rounded-md hover:bg-gray-600 mt-2"
           >
             Cancel
           </button>
@@ -355,20 +401,21 @@ const AdminDashboard = () => {
             key={prod._id}
             className="flex justify-between items-center p-4 bg-gray-100 rounded-lg"
           >
-            <div>
+            <div className="flex items-center">
               <span className="font-semibold">{prod.title}</span>
-              {prod.images && prod.images.length > 0 && (
+              {prod.images?.length > 0 && (
                 <img
                   src={prod.images[0]}
                   alt={prod.title}
                   className="w-16 h-16 object-cover ml-4"
+                  loading="lazy"
                 />
               )}
             </div>
-            <div>
+            <div className="flex gap-4">
               <button
                 onClick={() => setEditingProduct(prod)}
-                className="text-blue-500 mr-4 hover:underline"
+                className="text-blue-500 hover:underline"
               >
                 Edit
               </button>
@@ -419,7 +466,7 @@ const AdminDashboard = () => {
           <button
             type="button"
             onClick={() => setEditingCategory(null)}
-            className="bg-gray-500 text-white p-2 w-full rounded-md hover:bg-gray-600"
+            className="bg-gray-500 text-white p-2 w-full rounded-md hover:bg-gray-600 mt-2"
           >
             Cancel
           </button>
@@ -438,13 +485,14 @@ const AdminDashboard = () => {
                   src={cat.image}
                   alt={cat.name}
                   className="w-12 h-12 object-cover ml-4"
+                  loading="lazy"
                 />
               )}
             </div>
-            <div>
+            <div className="flex gap-4">
               <button
                 onClick={() => setEditingCategory(cat)}
-                className="text-blue-500 mr-4 hover:underline"
+                className="text-blue-500 hover:underline"
               >
                 Edit
               </button>
@@ -474,6 +522,9 @@ const AdminDashboard = () => {
           className="border p-2 w-full rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Email"
         />
+        {userFormik.touched.email && userFormik.errors.email && (
+          <p className="text-red-500">{userFormik.errors.email}</p>
+        )}
         <input
           name="password"
           type="password"
@@ -482,6 +533,9 @@ const AdminDashboard = () => {
           className="border p-2 w-full rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Password"
         />
+        {userFormik.touched.password && userFormik.errors.password && (
+          <p className="text-red-500">{userFormik.errors.password}</p>
+        )}
         <input
           name="name"
           value={userFormik.values.name}
@@ -489,6 +543,9 @@ const AdminDashboard = () => {
           className="border p-2 w-full rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Name"
         />
+        {userFormik.touched.name && userFormik.errors.name && (
+          <p className="text-red-500">{userFormik.errors.name}</p>
+        )}
         <select
           name="role"
           value={userFormik.values.role}
@@ -516,7 +573,7 @@ const AdminDashboard = () => {
           <button
             type="button"
             onClick={() => setEditingUser(null)}
-            className="bg-gray-500 text-white p-2 w-full rounded-md hover:bg-gray-600"
+            className="bg-gray-500 text-white p-2 w-full rounded-md hover:bg-gray-600 mt-2"
           >
             Cancel
           </button>
@@ -534,16 +591,17 @@ const AdminDashboard = () => {
                   src={user.avatar}
                   alt={user.name}
                   className="w-12 h-12 rounded-full mr-4"
+                  loading="lazy"
                 />
               )}
               <span>
                 {user.name} ({user.role})
               </span>
             </div>
-            <div>
+            <div className="flex gap-4">
               <button
                 onClick={() => setEditingUser(user)}
-                className="text-blue-500 mr-4 hover:underline"
+                className="text-blue-500 hover:underline"
               >
                 Edit
               </button>

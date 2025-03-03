@@ -1,25 +1,42 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../redux/store';
+import { RootState, AppDispatch } from '../redux/store';
 import { addToCartAsync } from '../redux/cartSlice';
-import { AppDispatch } from '../redux/store';
 import styles from '../components/ProductList/ProductList.module.scss';
 
+interface Product {
+  _id: string;
+  title: string;
+  price: number;
+  description: string;
+  images: string[];
+}
+
 const Home = () => {
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const { token } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     const fetchProducts = async () => {
+      setLoading(true);
+      setError(null);
       try {
         const response = await axios.get(
           `${process.env.REACT_APP_API_URL}/products`,
         );
         setProducts(response.data);
-      } catch (error) {
-        console.error('Error fetching products:', error);
+      } catch (err: any) {
+        setError('Failed to load products');
+        console.error(
+          'Error fetching products:',
+          err.response?.data || err.message,
+        );
+      } finally {
+        setLoading(false);
       }
     };
     fetchProducts();
@@ -30,6 +47,10 @@ const Home = () => {
       dispatch(addToCartAsync({ productId, quantity: 1 }));
     }
   };
+
+  if (loading)
+    return <p className="text-center text-gray-500">Loading products...</p>;
+  if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
     <div className="container mx-auto p-6">
@@ -56,11 +77,12 @@ const Home = () => {
               <p className={`${styles.description} mb-4`}>
                 {product.description}
               </p>
-              {product.images && product.images.length > 0 && (
+              {product.images?.length > 0 && (
                 <img
                   src={product.images[0]}
                   alt={product.title}
                   className={`${styles.image} w-full h-48 object-cover`}
+                  loading="lazy"
                 />
               )}
               {token ? (
