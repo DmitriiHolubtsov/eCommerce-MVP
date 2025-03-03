@@ -28,7 +28,7 @@ export const addToCartAsync = createAsyncThunk(
     const token = localStorage.getItem('token');
     try {
       const response = await axios.post(
-        'http://localhost:5001/api/v1/orders/cart/add',
+        `${process.env.REACT_APP_API_URL}/orders/cart/add`,
         { productId, quantity },
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -55,7 +55,7 @@ const cartSlice = createSlice({
       const token = localStorage.getItem('token');
       axios
         .post(
-          'http://localhost:5001/api/v1/orders/cart/remove',
+          `${process.env.REACT_APP_API_URL}/orders/cart/remove`,
           { productId: action.payload },
           { headers: { Authorization: `Bearer ${token}` } },
         )

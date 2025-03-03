@@ -5,7 +5,7 @@ export const uploadFile = async (req: Request, res: Response) => {
     return res.status(400).json({ message: 'No file uploaded' });
   }
 
-  const fileUrl = `http://localhost:5001/uploads/${req.file.filename}`;
+  const fileUrl = `${process.env.API_URL}/uploads/${req.file.filename}`;
   res.status(201).json({ url: fileUrl });
 };
 

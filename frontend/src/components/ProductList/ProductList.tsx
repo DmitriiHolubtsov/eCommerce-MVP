@@ -16,7 +16,9 @@ const ProductList = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await axios.get('http://localhost:5001/api/v1/categories');
+        const res = await axios.get(
+          `${process.env.REACT_APP_API_URL}/categories`,
+        );
         setCategories(res.data);
       } catch (error) {
         console.error('Error fetching categories:', error);
@@ -26,8 +28,8 @@ const ProductList = () => {
     const fetchProducts = async () => {
       try {
         const url = selectedCategory
-          ? `http://localhost:5001/api/v1/categories/${selectedCategory}/products`
-          : 'http://localhost:5001/api/v1/products';
+          ? `${process.env.REACT_APP_API_URL}/categories/${selectedCategory}/products`
+          : `${process.env.REACT_APP_API_URL}/products`;
         const res = await axios.get(url);
         setProducts(res.data);
       } catch (error) {

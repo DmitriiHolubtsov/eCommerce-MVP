@@ -21,7 +21,11 @@ const app = express();
 
 app.use(
   cors({
-    origin: ['http://localhost:3000', 'http://localhost:3001'],
+    origin: [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'https://e-commerce-mvp-uuse.vercel.app',
+    ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
@@ -41,7 +45,12 @@ app.use(
   express.static(path.join(__dirname, '..', 'uploads'), {
     setHeaders: (res, filePath) => {
       console.log('Serving file:', filePath, 'Status:', res.statusCode);
-      res.set('Access-Control-Allow-Origin', 'http://localhost:3001');
+      res.set(
+        'Access-Control-Allow-Origin',
+        process.env.NODE_ENV === 'production'
+          ? 'https://e-commerce-mvp-uuse.vercel.app'
+          : 'http://localhost:3001',
+      );
     },
   }),
 );

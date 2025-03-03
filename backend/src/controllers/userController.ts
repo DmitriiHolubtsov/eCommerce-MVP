@@ -23,7 +23,7 @@ export const createUser = async (req: Request, res: Response) => {
       name,
       role: role || 'user',
       avatar: req.file
-        ? `http://localhost:5001/uploads/${req.file.filename}`
+        ? `${process.env.API_URL}/uploads/${req.file.filename}`
         : undefined,
     });
     await user.save();
@@ -46,8 +46,8 @@ export const updateUser = async (req: Request, res: Response) => {
     req.body.password = await bcrypt.hash(req.body.password, 10);
   }
   if (req.file) {
-    req.body.avatar = `http://localhost:5001/uploads/${req.file.filename}`;
-    console.log('Avatar uploaded:', req.body.avatar); // Додаємо лог для дебагінгу
+    req.body.avatar = `${process.env.API_URL}/uploads/${req.file.filename}`;
+    console.log('Avatar uploaded:', req.body.avatar);
   }
   try {
     const user = await User.findByIdAndUpdate(req.params.id, req.body, {

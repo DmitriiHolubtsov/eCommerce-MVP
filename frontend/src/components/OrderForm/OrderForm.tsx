@@ -19,7 +19,7 @@ const OrderForm = () => {
       setLoading(true);
       try {
         const res = await axios.get(
-          'http://localhost:5001/api/v1/nova-poshta/branches',
+          `${process.env.REACT_APP_API_URL}/nova-poshta/branches`,
         );
         setBranches(res.data);
         setError(null);
@@ -42,7 +42,7 @@ const OrderForm = () => {
     setLoading(true);
     try {
       await axios.post(
-        'http://localhost:5001/api/v1/orders/create',
+        `${process.env.REACT_APP_API_URL}/orders/create`,
         { novaPoshtaBranch: selectedBranch },
         { headers: { Authorization: `Bearer ${token}` } },
       );

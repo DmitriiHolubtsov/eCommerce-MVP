@@ -27,10 +27,10 @@ const UserDashboard = () => {
     const fetchData = async () => {
       try {
         const [userRes, locationsRes] = await Promise.all([
-          axios.get('http://localhost:5001/api/v1/auth/profile', {
+          axios.get(`${process.env.REACT_APP_API_URL}/auth/profile`, {
             headers: { Authorization: `Bearer ${storedToken || token}` },
           }),
-          axios.get('http://localhost:5001/api/v1/locations', {
+          axios.get(`${process.env.REACT_APP_API_URL}/locations`, {
             headers: { Authorization: `Bearer ${storedToken || token}` },
           }),
         ]);

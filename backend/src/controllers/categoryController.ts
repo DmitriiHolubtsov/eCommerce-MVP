@@ -9,7 +9,9 @@ export const getCategories = async (_req: Request, res: Response) => {
 
 export const createCategory = async (req: Request, res: Response) => {
   const { name } = req.body;
-  const image = req.file ? `http://localhost:5001/uploads/${req.file.filename}` : undefined;
+  const image = req.file
+    ? `${process.env.API_URL}/uploads/${req.file.filename}`
+    : undefined;
 
   if (!name) {
     return res.status(400).json({ message: 'Name is required' });
@@ -39,11 +41,14 @@ export const getCategoryById = async (req: Request, res: Response) => {
 export const updateCategory = async (req: Request, res: Response) => {
   const { name } = req.body;
   if (req.file) {
-    req.body.image = `http://localhost:5001/uploads/${req.file.filename}`;
+    req.body.image = `${process.env.API_URL}/uploads/${req.file.filename}`;
   }
   try {
-    const category = await Category.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!category) return res.status(404).json({ message: 'Category not found' });
+    const category = await Category.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
+    if (!category)
+      return res.status(404).json({ message: 'Category not found' });
     console.log('Category updated:', category);
     res.json(category);
   } catch (error) {

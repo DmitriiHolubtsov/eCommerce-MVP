@@ -26,7 +26,7 @@ const LoginForm = () => {
       console.log('Login form submitted with values:', values);
       try {
         const res = await axios.post(
-          'http://localhost:5001/api/v1/auth/login',
+          `${process.env.REACT_APP_API_URL}/auth/login`,
           values,
           {
             headers: { 'Content-Type': 'application/json' },

@@ -15,7 +15,7 @@ interface ProductFormValues {
 
 interface CategoryFormValues {
   name: string;
-  image?: File | null; // Змінюємо з string на File для завантаження
+  image?: File | null;
 }
 
 interface UserFormValues {
@@ -39,13 +39,13 @@ const AdminDashboard = () => {
     const fetchData = async () => {
       try {
         const [catRes, prodRes, userRes] = await Promise.all([
-          axios.get('http://localhost:5001/api/v1/categories', {
+          axios.get(`${process.env.REACT_APP_API_URL}/categories`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get('http://localhost:5001/api/v1/products', {
+          axios.get(`${process.env.REACT_APP_API_URL}/products`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get('http://localhost:5001/api/v1/users', {
+          axios.get(`${process.env.REACT_APP_API_URL}/users`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
@@ -85,7 +85,7 @@ const AdminDashboard = () => {
       try {
         if (editingProduct) {
           const res = await axios.put(
-            `http://localhost:5001/api/v1/products/${editingProduct._id}`,
+            `${process.env.REACT_APP_API_URL}/products/${editingProduct._id}`,
             formData,
             {
               headers: {
@@ -100,7 +100,7 @@ const AdminDashboard = () => {
           setEditingProduct(null);
         } else {
           const res = await axios.post(
-            'http://localhost:5001/api/v1/products',
+            `${process.env.REACT_APP_API_URL}/products`,
             formData,
             {
               headers: {
@@ -138,7 +138,7 @@ const AdminDashboard = () => {
       try {
         if (editingCategory) {
           const res = await axios.put(
-            `http://localhost:5001/api/v1/categories/${editingCategory._id}`,
+            `${process.env.REACT_APP_API_URL}/categories/${editingCategory._id}`,
             formData,
             {
               headers: {
@@ -155,7 +155,7 @@ const AdminDashboard = () => {
           setEditingCategory(null);
         } else {
           const res = await axios.post(
-            'http://localhost:5001/api/v1/categories',
+            `${process.env.REACT_APP_API_URL}/categories`,
             formData,
             {
               headers: {
@@ -201,7 +201,7 @@ const AdminDashboard = () => {
       try {
         if (editingUser) {
           const res = await axios.put(
-            `http://localhost:5001/api/v1/users/${editingUser._id}`,
+            `${process.env.REACT_APP_API_URL}/users/${editingUser._id}`,
             formData,
             {
               headers: {
@@ -216,7 +216,7 @@ const AdminDashboard = () => {
           setEditingUser(null);
         } else {
           const res = await axios.post(
-            'http://localhost:5001/api/v1/users',
+            `${process.env.REACT_APP_API_URL}/users`,
             formData,
             {
               headers: {
@@ -235,21 +235,21 @@ const AdminDashboard = () => {
   });
 
   const deleteProduct = async (id: string) => {
-    await axios.delete(`http://localhost:5001/api/v1/products/${id}`, {
+    await axios.delete(`${process.env.REACT_APP_API_URL}/products/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     setProducts(products.filter((p) => p._id !== id));
   };
 
   const deleteCategory = async (id: string) => {
-    await axios.delete(`http://localhost:5001/api/v1/categories/${id}`, {
+    await axios.delete(`${process.env.REACT_APP_API_URL}/categories/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     setCategories(categories.filter((c) => c._id !== id));
   };
 
   const deleteUser = async (id: string) => {
-    await axios.delete(`http://localhost:5001/api/v1/users/${id}`, {
+    await axios.delete(`${process.env.REACT_APP_API_URL}/users/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     setUsers(users.filter((u) => u._id !== id));

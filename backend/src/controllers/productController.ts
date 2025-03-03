@@ -11,7 +11,7 @@ export const createProduct = async (req: Request, res: Response) => {
   const { title, price, description, category } = req.body;
   const images = req.files
     ? (req.files as Express.Multer.File[]).map(
-        (file) => `http://localhost:5001/uploads/${file.filename}`,
+        (file) => `${process.env.API_URL}/uploads/${file.filename}`,
       )
     : [];
 
@@ -56,7 +56,7 @@ export const updateProduct = async (req: Request, res: Response) => {
   if (title) req.body.slug = slugify(title, { lower: true });
   if (req.files) {
     req.body.images = (req.files as Express.Multer.File[]).map(
-      (file) => `http://localhost:5001/uploads/${file.filename}`,
+      (file) => `${process.env.API_URL}/uploads/${file.filename}`,
     );
   }
   const product = await Product.findByIdAndUpdate(req.params.id, req.body, {

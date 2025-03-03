@@ -28,7 +28,7 @@ const RegisterForm = () => {
       console.log('Register form submitted with values:', values);
       try {
         const res = await axios.post(
-          'http://localhost:5001/api/v1/auth/register',
+          `${process.env.REACT_APP_API_URL}/auth/register`,
           values,
           {
             headers: { 'Content-Type': 'application/json' },

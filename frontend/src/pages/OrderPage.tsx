@@ -22,8 +22,8 @@ const OrderPage = () => {
       setLoading(true);
       try {
         const [locationsRes, branchesRes] = await Promise.all([
-          axios.get('http://localhost:5001/api/v1/locations'),
-          axios.get('http://localhost:5001/api/v1/nova-poshta/branches'),
+          axios.get(`${process.env.REACT_APP_API_URL}/locations`),
+          axios.get(`${process.env.REACT_APP_API_URL}/nova-poshta/branches`),
         ]);
         setLocations(locationsRes.data);
         setBranches(branchesRes.data);
@@ -58,7 +58,7 @@ const OrderPage = () => {
     console.log('Sending order request...');
     try {
       const response = await axios.post(
-        'http://localhost:5001/api/v1/orders/create',
+        `${process.env.REACT_APP_API_URL}/orders/create`,
         { novaPoshtaBranch: selectedBranch, location: selectedLocation },
         { headers: { Authorization: `Bearer ${token}` } },
       );
