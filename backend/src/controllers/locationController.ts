@@ -4,6 +4,7 @@ import Location from '../models/Location';
 export const getLocations = async (_req: Request, res: Response) => {
   try {
     const locations = await Location.find();
+    console.log('Fetched locations:', locations);
     if (!locations || locations.length === 0) {
       return res.status(404).json({ message: 'No locations found' });
     }

@@ -35,7 +35,7 @@ app.use(
 app.options('*', cors());
 
 app.use((req, res, next) => {
-  console.log(`Request: ${req.method} ${req.url}`);
+  console.log(`Request: ${req.method} ${req.url} from ${req.headers.origin}`);
   next();
 });
 
@@ -78,7 +78,9 @@ const createInitialAdmin = async () => {
       role: 'admin',
     });
     await admin.save();
-    console.log('Initial admin created: admin@example.com / admin123');
+    console.log('Initial admin created:', admin);
+  } else {
+    console.log('Admin already exists:', adminExists);
   }
 };
 
