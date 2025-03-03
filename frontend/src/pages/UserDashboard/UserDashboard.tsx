@@ -17,14 +17,22 @@ const UserDashboard = () => {
   const [user, setUser] = useState<any>(null);
   const [avatar, setAvatar] = useState<File | null>(null);
   const [locations, setLocations] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
+    console.log('Current token from Redux:', token);
+    console.log('Stored token from localStorage:', storedToken);
+
     if (storedToken && !token) {
+      console.log('Dispatching login with stored token');
       dispatch(login(storedToken));
     }
 
     const fetchData = async () => {
+      setLoading(true);
+      setError(null);
       try {
         const [userRes, locationsRes] = await Promise.all([
           axios.get(`${process.env.REACT_APP_API_URL}/auth/profile`, {
@@ -37,8 +45,15 @@ const UserDashboard = () => {
         console.log('User data fetched:', userRes.data);
         setUser(userRes.data);
         console.log('Locations fetched:', locationsRes.data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
+        setLocations(locationsRes.data);
+      } catch (err: any) {
+        console.error(
+          'Error fetching data:',
+          err.response?.data || err.message,
+        );
+        setError('Failed to load dashboard data');
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -75,6 +90,9 @@ const UserDashboard = () => {
 
   const decodedToken = jwtDecode<{ role: string }>(token);
   const isAdmin = decodedToken.role === 'admin';
+
+  if (loading) return <p className="p-4 text-gray-500">Loading...</p>;
+  if (error) return <p className="p-4 text-red-500">{error}</p>;
 
   return (
     <div className={styles.dashboardContainer}>

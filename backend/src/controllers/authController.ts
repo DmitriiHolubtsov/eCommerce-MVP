@@ -59,9 +59,7 @@ export const register = async (req: Request, res: Response) => {
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET as string,
-      {
-        expiresIn: '1h',
-      },
+      { expiresIn: '1h' },
     );
     console.log('User registered, token generated:', { user, token });
     res.status(201).json({ token });
@@ -73,15 +71,9 @@ export const register = async (req: Request, res: Response) => {
 
 export const getProfile = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.id;
-    const user = await User.findById(userId).select('-password');
-
-    if (!user) {
-      console.log('User not found:', userId);
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    console.log('Profile fetched:', user);
+    const user = await User.findById((req as any).user.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    console.log('Profile fetched for user:', user.email);
     res.json(user);
   } catch (error) {
     console.error('Error fetching profile:', error);
