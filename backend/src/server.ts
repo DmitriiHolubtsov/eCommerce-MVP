@@ -45,12 +45,7 @@ app.use(
   express.static(path.join(__dirname, '..', 'uploads'), {
     setHeaders: (res, filePath) => {
       console.log('Serving file:', filePath, 'Status:', res.statusCode);
-      res.set(
-        'Access-Control-Allow-Origin',
-        process.env.NODE_ENV === 'production'
-          ? 'https://e-commerce-mvp-uuse.vercel.app'
-          : 'http://localhost:3001',
-      );
+      res.set('Access-Control-Allow-Origin', '*');
     },
   }),
 );
