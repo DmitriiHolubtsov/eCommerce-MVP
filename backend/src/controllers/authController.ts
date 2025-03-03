@@ -40,33 +40,33 @@ export const register = async (req: Request, res: Response) => {
 
   console.log('Register attempt:', { email, password, name, role });
 
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    console.log('User already exists:', existingUser);
+    return res.status(400).json({ message: 'User already exists' });
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const user = new User({
+    email,
+    password: hashedPassword,
+    name,
+    role: role || 'user',
+  });
+
   try {
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      console.log('User already exists:', email);
-      return res.status(400).json({ message: 'User already exists' });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({
-      email,
-      password: hashedPassword,
-      name,
-      role: role || 'user',
-    });
-
     await user.save();
-    console.log('User registered:', user);
-
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET as string,
-      { expiresIn: '1h' },
+      {
+        expiresIn: '1h',
+      },
     );
-
+    console.log('User registered, token generated:', { user, token });
     res.status(201).json({ token });
   } catch (error) {
-    console.error('Error during registration:', error);
+    console.error('Error registering user:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };

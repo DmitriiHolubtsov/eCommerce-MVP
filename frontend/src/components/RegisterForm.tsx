@@ -25,7 +25,7 @@ const RegisterForm = () => {
     }),
     onSubmit: async (values) => {
       setStatus('Registering...');
-      console.log('Register form submitted with values:', values);
+      console.log('Register attempt:', values);
       try {
         const res = await axios.post(
           `${process.env.REACT_APP_API_URL}/auth/register`,
@@ -36,8 +36,9 @@ const RegisterForm = () => {
         );
         console.log('Register response:', res.data);
         dispatch(login(res.data.token));
+        console.log('Dispatched login with token:', res.data.token);
         localStorage.setItem('token', res.data.token);
-        console.log('Dispatched login and set token');
+        console.log('Token saved to localStorage');
         setStatus('Registration successful!');
         navigate('/dashboard');
         console.log('Navigated to /dashboard');
