@@ -19,13 +19,13 @@ dotenv.config();
 
 const app = express();
 
-// Налаштування CORS першим
 app.use(
   cors({
     origin: [
       'http://localhost:3000',
       'http://localhost:3001',
-      'https://e-commerce-mvp-uuse.vercel.app',
+      'https://e-commerce-mvp.vercel.app',
+      'https://e-commerce-mvp-uuse.vercel.app', 
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -39,6 +39,7 @@ app.options(
     origin: [
       'http://localhost:3000',
       'http://localhost:3001',
+      'https://e-commerce-mvp.vercel.app',
       'https://e-commerce-mvp-uuse.vercel.app',
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -47,7 +48,6 @@ app.options(
   }),
 );
 
-// Логування запитів і відповідей
 app.use((req, res, next) => {
   console.log(`Request: ${req.method} ${req.url} from ${req.headers.origin}`);
   res.on('finish', () => {
