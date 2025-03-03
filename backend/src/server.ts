@@ -15,6 +15,15 @@ import novaPoshtaRoutes from './routes/novaPoshtaRoutes';
 import Location from './models/Location';
 import path from 'path';
 
+setInterval(() => {
+  const memoryUsage = process.memoryUsage();
+  console.log('Memory usage:', {
+    rss: `${(memoryUsage.rss / 1024 / 1024).toFixed(2)} MB`,
+    heapTotal: `${(memoryUsage.heapTotal / 1024 / 1024).toFixed(2)} MB`,
+    heapUsed: `${(memoryUsage.heapUsed / 1024 / 1024).toFixed(2)} MB`,
+  });
+}, 60000);
+
 dotenv.config();
 
 const app = express();
