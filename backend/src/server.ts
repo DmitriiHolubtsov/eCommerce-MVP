@@ -19,7 +19,6 @@ dotenv.config();
 
 const app = express();
 
-// Налаштування CORS
 app.use(
   cors({
     origin: [
@@ -33,7 +32,6 @@ app.use(
   }),
 );
 
-// Дозволяємо OPTIONS для всіх маршрутів
 app.options(
   '*',
   cors({
@@ -50,6 +48,11 @@ app.options(
 
 app.use((req, res, next) => {
   console.log(`Request: ${req.method} ${req.url} from ${req.headers.origin}`);
+  res.on('finish', () => {
+    console.log(
+      `Response: ${req.method} ${req.url} - Status: ${res.statusCode}`,
+    );
+  });
   next();
 });
 

@@ -3,8 +3,14 @@ import Product from '../models/Product';
 import slugify from 'slugify';
 
 export const getProducts = async (_req: Request, res: Response) => {
-  const products = await Product.find().populate('category', 'name');
-  res.json(products);
+  try {
+    const products = await Product.find().populate('category', 'name');
+    console.log('Products fetched:', products.length);
+    res.json(products);
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    res.status(500).json({ message: 'Error fetching products', error });
+  }
 };
 
 export const createProduct = async (req: Request, res: Response) => {
