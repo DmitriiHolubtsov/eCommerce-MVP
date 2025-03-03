@@ -20,7 +20,7 @@ export const createCategory = async (req: Request, res: Response) => {
   const category = new Category({
     name,
     image,
-    createdBy: (req as any).user.id, // Додаємо ID користувача з JWT
+    createdBy: (req as any).user.id,
   });
 
   try {
