@@ -3,7 +3,7 @@ node_modules
 .vs_code
 .DStore
 .idea/
-package-lock.json
+# package-lock.json
 .env
 dist
 uploads

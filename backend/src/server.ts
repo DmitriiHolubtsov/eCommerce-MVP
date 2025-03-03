@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
@@ -24,22 +24,6 @@ app.use(
     origin: [
       'http://localhost:3000',
       'http://localhost:3001',
-      'https://e-commerce-mvp.vercel.app',
-      'https://e-commerce-mvp-uuse.vercel.app', 
-    ],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
-  }),
-);
-
-app.options(
-  '*',
-  cors({
-    origin: [
-      'http://localhost:3000',
-      'http://localhost:3001',
-      'https://e-commerce-mvp.vercel.app',
       'https://e-commerce-mvp-uuse.vercel.app',
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -48,13 +32,10 @@ app.options(
   }),
 );
 
-app.use((req, res, next) => {
+app.options('*', cors());
+
+app.use((req: Request, res: Response, next: NextFunction) => {
   console.log(`Request: ${req.method} ${req.url} from ${req.headers.origin}`);
-  res.on('finish', () => {
-    console.log(
-      `Response: ${req.method} ${req.url} - Status: ${res.statusCode}`,
-    );
-  });
   next();
 });
 
@@ -62,7 +43,7 @@ app.use(express.json());
 app.use(
   '/uploads',
   express.static(path.join(__dirname, '..', 'uploads'), {
-    setHeaders: (res, filePath) => {
+    setHeaders: (res: Response, filePath: string) => {
       console.log('Serving file:', filePath, 'Status:', res.statusCode);
       res.set('Access-Control-Allow-Origin', '*');
     },
@@ -109,7 +90,6 @@ const createInitialLocations = async () => {
 mongoose
   .connect(process.env.MONGO_URI as string)
   .then(async () => {
-    console.log('MongoDB connected successfully');
     await createInitialAdmin();
     await createInitialLocations();
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
