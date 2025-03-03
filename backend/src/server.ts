@@ -19,22 +19,11 @@ dotenv.config();
 
 const app = express();
 
-app.use(
-  cors({
-    origin: [
-      'http://localhost:3000',
-      'http://localhost:3001',
-      'https://e-commerce-mvp.vercel.app',
-      'https://e-commerce-mvp-uuse.vercel.app', 
-    ],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
-  }),
-);
+// ✅ Middleware: Parse JSON Before Routes
+app.use(express.json());
 
-app.options(
-  '*',
+// ✅ Global CORS Middleware
+app.use(
   cors({
     origin: [
       'http://localhost:3000',
@@ -48,6 +37,21 @@ app.options(
   }),
 );
 
+// ✅ Explicitly Set CORS Headers for All Responses
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(204); // Handle preflight requests
+  }
+
+  next();
+});
+
+// ✅ Logger Middleware
 app.use((req, res, next) => {
   console.log(`Request: ${req.method} ${req.url} from ${req.headers.origin}`);
   res.on('finish', () => {
@@ -58,17 +62,18 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.json());
+// ✅ Serve Static Files with Proper CORS Headers
 app.use(
   '/uploads',
   express.static(path.join(__dirname, '..', 'uploads'), {
-    setHeaders: (res, filePath) => {
-      console.log('Serving file:', filePath, 'Status:', res.statusCode);
-      res.set('Access-Control-Allow-Origin', '*');
+    setHeaders: (res) => {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Access-Control-Allow-Methods', 'GET');
     },
   }),
 );
 
+// ✅ Routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1', categoryRoutes);
 app.use('/api/v1', productRoutes);
@@ -80,6 +85,7 @@ app.use('/api/v1', novaPoshtaRoutes);
 
 const PORT = process.env.PORT || 5001;
 
+// ✅ Function to Create Initial Admin User
 const createInitialAdmin = async () => {
   const adminEmail = 'admin@example.com';
   const adminExists = await User.findOne({ email: adminEmail });
@@ -98,6 +104,7 @@ const createInitialAdmin = async () => {
   }
 };
 
+// ✅ Function to Create Initial Locations
 const createInitialLocations = async () => {
   const locationsExist = await Location.countDocuments();
   if (locationsExist === 0) {
@@ -106,6 +113,7 @@ const createInitialLocations = async () => {
   }
 };
 
+// ✅ Connect to MongoDB and Start Server
 mongoose
   .connect(process.env.MONGO_URI as string)
   .then(async () => {
