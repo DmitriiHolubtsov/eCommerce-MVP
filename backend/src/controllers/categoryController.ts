@@ -17,7 +17,11 @@ export const createCategory = async (req: Request, res: Response) => {
     return res.status(400).json({ message: 'Name is required' });
   }
 
-  const category = new Category({ name, image });
+  const category = new Category({
+    name,
+    image,
+    createdBy: (req as any).user.id, // Додаємо ID користувача з JWT
+  });
 
   try {
     await category.save();
